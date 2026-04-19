@@ -1,0 +1,18 @@
+version: "3.1"
+
+stories:
+
+- story: casos de estudio planta energia nuclear
+  steps:
+  - intent: planta_energia_nuclear
+  - action: utter_planta_nuclear
+  - action: utter_continuar_caso_estudio
+  # - action: utter_preg_continuar_casos_estudio  
+
+- story: casos de estudio trafico carreteras
+  steps:
+  - intent: trafico_carretera
+  - action: utter_trafico_carretera  
+  - action: utter_continuar_caso_estudio
+  # - action: utter_preg_continuar_casos_estudio  
+

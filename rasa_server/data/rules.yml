@@ -1,0 +1,290 @@
+version: "3.1"
+
+rules:
+
+- rule: saludo usuario logeado
+  steps:
+  - intent: inicio_sesion
+  - action: utter_saludo_personalizado
+  - action: action_seleccionar_caso  
+
+- rule: datos caso estudio
+  steps:
+  - intent: datos_caso
+  - action: action_datos_caso   
+
+- rule: decir adiós
+  steps:
+  - intent: despedida
+  - action: utter_despedida_con_nombre
+
+- rule: consultar ia
+  steps:
+    - intent: nlu_fallback
+    - action: action_preguntar_ia
+    
+- rule: Responder al error de esquema 1
+  steps:
+  - intent: error_schema_1
+  - action: utter_error_schema_1 
+
+- rule: Responder al error de esquema 2
+  steps:
+  - intent: error_schema_2
+  - action: utter_error_schema_2   
+    
+- rule: Responder al error de esquema 3
+  steps:
+  - intent: error_schema_3
+  - action: utter_error_schema_3    
+
+- rule: Entregar ayuda error esquema
+  steps:  
+  - intent: ayuda_error_schema
+  - action: utter_ayuda_error_schema
+  - action: utter_sintaxis_schema  
+  
+- rule: Responder al error anotacion
+  steps:
+  - intent: error_anotacion
+  - action: utter_error_anotacion
+  
+- rule: Entregar ayuda error anotacion
+  steps:
+  - intent: ayuda_error_anotacion
+  - action: utter_ayuda_error_anotacion
+
+- rule: Responder al error insert
+  steps:
+  - intent: error_insert
+  - action: utter_error_insert 
+  
+- rule: Entregar ayuda error insert
+  steps:
+  - intent: ayuda_error_insert
+  - action: utter_ayuda_error_insert    
+
+- rule: Responder error select monitor
+  steps:
+  - intent: error_select_monitor
+  - action: utter_error_select_monitor        
+  
+- rule: Responder ayuda select monitor
+  steps:  
+  - intent: ayuda_error_select_monitor
+  - action: utter_ayuda_error_select_monitor  
+  - action: utter_continuar_select_monitor 
+
+- rule: Responder explicacion select monitor
+  steps:  
+  - intent: explicar_sintaxis_select_monitor
+  - action: utter_sintaxis_select
+  - action: utter_continuar_select_monitor_funcion_agregacion
+  
+- rule: Responder explicacion funcion agregacion monitor
+  steps:  
+  - intent: explicar_funcion_agregacion
+  - action: utter_funcion_agregacion   
+  - action: utter_continuar_select_monitor_ventana
+  
+- rule: Responder explicacion ventana datos monitor
+  steps:  
+  - intent: explicar_ventanas
+  - action: utter_ventana_datos   
+  - action: utter_continuar_select_monitor_ventana_tiempo
+  
+- rule: Responder explicacion ventana datos de tiempo monitor
+  steps:  
+  - intent: explicar_ventanas_tiempo
+  - action: utter_ventana_por_tiempo  
+
+- rule: Responder al error select warning
+  steps:
+  - intent: error_select_warning
+  - action: utter_error_select_warning    
+  
+- rule: Responder ayuda select warning
+  steps:  
+  - intent: ayuda_error_select_warning
+  - action: utter_ayuda_error_select_warning  
+  - action: utter_continuar_select_warning  
+  
+- rule: Responder explicacion select warning
+  steps:  
+  - intent: explicar_sintaxis_select_warning
+  - action: utter_sintaxis_select
+  - action: utter_continuar_select_patron  
+  
+- rule: Responder explicacion patrones
+  steps:  
+  - intent: explicar_patron
+  - action: utter_operadores_epl
+  - action: utter_patrones   
+  - action: utter_operadores_patron
+  - action: utter_every
+  
+- rule: Responder al error select critical
+  steps:
+  - intent: error_select_critical
+  - action: utter_error_select_critical   
+  
+- rule: Responder ayuda error select critical
+  steps:
+  - intent: ayuda_error_select_critical
+  - action: utter_ayuda_error_select_critical
+  - action: utter_continuar_select_critical 
+  
+- rule: Responder explicacion select critical
+  steps:  
+  - intent: explicar_sintaxis_select_critical
+  - action: utter_sintaxis_select
+  - action: utter_continuar_select_patron   
+
+- rule: Responder al error select explosion rueda
+  steps:
+  - intent: error_select_explosion_rueda
+  - action: utter_error_select_explosion_rueda    
+  
+- rule: Responder ayuda error select explosion rueda
+  steps:
+  - intent: ayuda_error_select_explosion_rueda
+  - action: utter_ayuda_error_select_explosion_rueda
+  - action: utter_continuar_select_caso2
+
+- rule: Responder explicacion select caso 2
+  steps:  
+  - intent: explicar_sintaxis_select_caso2
+  - action: utter_sintaxis_select
+  - action: utter_operadores_epl
+  - action: utter_continuar_select_patron_caso2
+
+- rule: Responder explicacion select patron caso 2
+  steps:  
+  - intent: explicar_sintaxis_select_patron_caso2  
+  - action: utter_patrones   
+  - action: utter_operadores_patron
+  - action: utter_every
+  - action: utter_guarda
+  
+- rule: Responder al error select colision
+  steps:
+  - intent: error_select_colision
+  - action: utter_error_select_colision    
+  
+- rule: Responder ayuda error select colision
+  steps:
+  - intent: ayuda_error_select_colision
+  - action: utter_ayuda_error_select_colision
+  - action: utter_continuar_select_caso2
+
+- rule: Responder al error select ocupante abandona asiento
+  steps:
+  - intent: error_select_ocupante_abandona_asiento
+  - action: utter_error_select_ocupante_abandona_asiento    
+ 
+- rule: Responder ayuda error select ocupante abandona asiento
+  steps:
+  - intent: ayuda_error_select_ocupante_abandona_asiento
+  - action: utter_ayuda_error_select_ocupante_abandona_asiento
+  - action: utter_continuar_select_caso2_oaa
+  
+- rule: Responder explicacion select caso 2 ocupante abandona asiento
+  steps:  
+  - intent: explicar_sintaxis_select_caso2_oaa
+  - action: utter_sintaxis_select
+  - action: utter_operadores_epl
+  - action: utter_continuar_select_patron_caso2_oaa  
+  
+- rule: Responder explicacion select patron caso 2 ocupante abandona asiento
+  steps:  
+  - intent: explicar_sintaxis_select_patron_caso2_oaa
+  - action: utter_patrones   
+  - action: utter_operadores_patron
+  - action: utter_every 
+ 
+- rule: Responder al error select accidente ocupante despedido
+  steps:
+  - intent: error_select_accidente_ocupante_despedido
+  - action: utter_error_select_accidente_ocupante_despedido    
+ 
+- rule: Responder ayuda error select accidente ocupante despedido
+  steps:
+  - intent: ayuda_error_select_accidente_ocupante_despedido
+  - action: utter_ayuda_error_select_accidente_ocupante_despedido
+  - action: utter_continuar_select_caso2  
+  
+- rule: error de datos
+  steps:
+  - intent: error_datos
+  - action: utter_error_datos
+  - action: utter_ayuda_error_datos  
+  - action: action_datos_caso
+  
+- rule: resultado escenario correcto epl
+  steps:
+  - intent: lista_llena_detectada
+  - action: utter_lista_llena_detectada 
+  
+- rule: no continuar
+  steps:
+  - intent: no_continuar
+  - action: utter_no_continuar 
+
+- rule: Procesar errores epl
+  steps:
+  - intent: error_epl_detectado  # El intent que dispare tu app web
+  - action: action_procesar_error_epl
+  
+- rule: consulta sobre conceptos básicos
+  steps:
+  - intent: conceptos_basicos
+  - action: utter_conceptos_basicos1
+  - action: utter_conceptos_basicos2
+  - action: utter_conceptos_basicos3
+  # - action: utter_continuar_conceptos_basicos   
+  
+- rule: consulta sobre sintaxis
+  steps:
+  - intent: consulta_sintaxis
+  - action: utter_evento
+  - action: utter_sintaxis_schema
+  - action: utter_sintaxis_epl
+  - action: utter_sintaxis_select
+
+- rule: epl online
+  steps:
+  - intent: epl_online
+  - action: utter_epl_online
+  - action: utter_funcion_epl_online
+  
+- rule: explicacion epl online
+  steps:
+  - intent: explicacion_epl_online
+  - action: utter_explicacion_epl_online
+  # - action: utter_explicacion_epl_online1
+  # - action: utter_explicacion_epl_online2
+  # - action: utter_explicacion_epl_online3
+  # - action: utter_explicacion_epl_online4
+  # - action: utter_explicacion_epl_online5
+  # - action: utter_ayuda_error_epl_online
+
+- rule: ayuda implementacion caso
+  steps:
+  - intent: ayuda_implementacion_caso
+  - action: action_ayuda_implementacion_caso 
+
+- rule: operadores y funciones epl
+  steps:
+  - intent: operadores_epl
+  - action: utter_operadores_epl
+  - action: utter_funcion_agregacion
+  # - action: utter_operadores_agregacion_cont
+  - action: utter_patrones
+  - action: utter_operadores_patron
+  
+- rule: ventana de datos
+  steps:
+  - intent: ventana_datos
+  - action: utter_ventana_datos  
+  - action: utter_ventana_por_numero  
+  - action: utter_ventana_por_tiempo  

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+    <h1>Iniciar Sesión</h1>
+	<form action="{{ url_for('login') }}" method="POST">
+        {{ form.csrf_token }}
+        <p>
+            {{ form.usuario.label }}<br>
+            {{ form.usuario(size=32) }}
+            {% for error in form.usuario.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.clave.label }}<br>
+            {{ form.clave(size=32) }}
+            {% for error in form.clave.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <p>¿No tienes una cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a>.</p>
+{% endblock %}

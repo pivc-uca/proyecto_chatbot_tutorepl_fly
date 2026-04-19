@@ -1,0 +1,13 @@
+Flask  
+Flask-SQLAlchemy 
+Flask-WTF 
+Werkzeug 
+Flask-Login 
+email_validator 
+requests 
+python-socketio 
+Flask-SocketIO 
+eventlet 
+groq 
+flask-cors
+python-dotenv

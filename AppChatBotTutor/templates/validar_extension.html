@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Entorno</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 90%; }
+        .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .instrucciones { display: none; text-align: left; }
+        .btn-download { display: inline-block; background-color: #2ecc71; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
+        .btn-download:hover { background-color: #27ae60; }
+        .alert { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="main-card">
+        <div id="check-container">
+            <h2>Verificando Configuración</h2>
+            <p>Comprobando si la extensión del monitor está activa...</p>
+            <div class="loader"></div>
+        </div>
+
+        <div id="instrucciones" class="instrucciones">
+            <div class="alert">
+                <strong>Acción requerida:</strong> No se detectó la extensión necesaria para la práctica.
+            </div>
+            <h3>Guía de Instalación Rápida</h3>
+            <ol>
+                <li>Descarga el paquete: <br>
+                    <a href="{{ url_for('static', filename='codigo_extension.zip') }}" class="btn-download" download>
+                        📥 Descargar Extensión (.zip)
+                    </a>
+                </li>
+                <br>
+                <li>Extrae el contenido del ZIP en una carpeta local.</li>
+                <li>En Chrome, abre <code>chrome://extensions/</code>.</li>
+                <li>Activa el <strong>"Modo desarrollador"</strong> y haz clic en <strong>"Cargar descomprimida"</strong>.</li>
+                <li>Selecciona la carpeta donde extrajiste el ZIP.</li>
+            </ol>
+            <hr>
+            <button onclick="window.location.reload()" style="cursor:pointer; padding: 10px; width: 100%; border: none; background: #3498db; color: white; border-radius: 6px;">
+                Ya la instalé, continuar con la práctica
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const EXT_ID = "{{ extension_id }}";
+        // URL a la que ir si la extensión está presente
+		const NEXT_URL = "{{ url_for('practica_epl', case_id=case_id, student_name=student_name) | safe }}";
+
+		function mostrarInstrucciones() {
+			document.getElementById('check-container').style.display = 'none';
+			document.getElementById('instrucciones').style.display = 'block';
+		}
+
+        function verificarExtension() {
+            if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage(EXT_ID, { message: "version" }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        // FALLO: Mostrar instrucciones
+						console.log("lastError:", chrome.runtime.lastError.message);
+                        mostrarInstrucciones();
+                    } else {
+                        // ÉXITO: Redirigir a la práctica
+						console.log("Extensión detectada. Respuesta:", response);
+                        window.location.href = NEXT_URL;
+                    }
+                });
+            } else {
+				console.log("No se puede acceder a chrome.runtime.sendMessage desde esta página.");
+				mostrarInstrucciones();
+            }
+        }
+
+        // Iniciamos la verificación tras 1.5 segundos para dar tiempo al navegador
+        setTimeout(verificarExtension, 1500);
+    </script>
+
+</body>
+</html>

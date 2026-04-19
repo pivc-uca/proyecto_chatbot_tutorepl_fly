@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Caso de Estudio 1: Planta de Energía Nuclear{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h1 class="mb-4 text-center">Caso de Estudio 1: Planta de Energía Nuclear</h1>
+            <p class="lead text-center">
+                Este escenario te sumerge en el monitoreo crítico de una planta de energía nuclear, donde la detección temprana de anomalías es vital.
+            </p>
+
+            <div class="text-center my-4">
+                <img src="{{ url_for('static', filename='imagenes/planta_nuclear.png') }}"
+                     alt="Diagrama de una planta de energía nuclear con indicadores de temperatura y presión."
+                     class="img-fluid rounded shadow" style="max-width: 800px; border: 1px solid #ddd;">
+            </div>
+
+            <h2 class="mt-5 mb-3">Descripción Detallada</h2>
+            <p>
+                En este caso, trabajarás con datos de sensores de temperatura de una planta de energía nuclear. El objetivo principal es aprender a construir consultas en el Lenguaje de Procesamiento de Eventos (EPL) que te permitan identificar situaciones en tiempo real. Esto incluye generar notificaciones cuando se detecten 3 tipos de eventos complejos:
+            </p>
+            <ul>
+                <li><strong>Monitor:</strong> Monitorear la temperatura promedio cada X segundos.</li>
+                <li><strong>Warning:</strong> Identificar si tenemos 2 temperaturas consecutivas por encima de un determinado umbral.</li>
+                <li><strong>Critical:</strong> Alertarnos si tenemos 4 eventos consecutivos, con el primero por encima de un cierto umbral, y cada uno posterior mayor que el último, y el último siendo 1,5 veces mayor que el primero.</li>
+            </ul>
+            <p>
+                Este caso está diseñado para <strong>principiantes</strong>, proporcionando una guía paso a paso para familiarizarte con la sintaxis y la lógica de EPL. Tu misión será prevenir incidentes detectando patrones de eventos que, de otra forma, pasarían desapercibidos en un flujo constante de datos.
+            </p>
+
+            <script>
+                // Variables para rastrear si los botones de Monitor, Warning y Critical han sido clickeados
+                let monitorClicked = false;
+                let warningClicked = false;
+                let criticalClicked = false;
+
+                // Función para mostrar un paso específico y ocultar los demás
+                function mostrarPaso(id) {
+                    //document.querySelectorAll('.paso').forEach(p => p.style.display = 'none');
+                    //document.getElementById(id).style.display = 'block';
+					const paso = document.getElementById(id);
+					paso.style.display = 'block';   // Lo muestra
+					paso.classList.add('visible');  // Marca que ya fue mostrado
+                }
+				
+                // Función para verificar el estado del botón "Paso 5"
+                function checkPaso5ButtonState() {
+                    const btnShowPaso5Content = document.getElementById('btnPaso5');
+
+                    // Deshabilitar los botones de Monitor, Warning, Critical una vez clickeados
+                    if (monitorClicked) { document.getElementById('btnMonitor').disabled = true; }
+                    if (warningClicked) { document.getElementById('btnWarning').disabled = true; }
+                    if (criticalClicked) { document.getElementById('btnCritical').disabled = true; }
+
+                    if (monitorClicked && warningClicked && criticalClicked) {
+                        btnShowPaso5Content.disabled = false; // Habilitar el botón para mostrar el contenido del Paso 5
+                    } else {
+                        btnShowPaso5Content.disabled = true; // Mantener deshabilitado
+                    }
+                }
+
+                // Función para intentar mostrar el Paso 5
+                function attemptShowPaso5() {
+                    //if (monitorClicked && warningClicked && criticalClicked) {
+                        mostrarPaso('paso5');
+						
+                        // Habilita y muestra el enlace a practica_epl.html
+                        const practicaLinkContainer = document.getElementById('practica-link-container');
+                        const linkPracticaEPL = document.getElementById('linkPracticaEPL');
+
+                        practicaLinkContainer.style.display = 'block'; // Muestra el contenedor del enlace
+                        linkPracticaEPL.classList.remove('disabled-link'); // Habilita el enlace	
+						
+						// Scroll automático al paso 5
+						scrollToPaso('paso5');						
+                   // } else {
+                        // Usar un mensaje personalizado en lugar de alert()
+                        //const messageBox = document.getElementById('messageBox');
+                        //const messageText = document.getElementById('messageText');
+                        //messageText.textContent = 'Debes recorrer los tres tipos de eventos complejos (Monitor, Warning y Critical) antes de avanzar al Paso 5.';
+                        //messageBox.style.display = 'block';
+                    //}
+                }
+				
+                // Función para cerrar el mensaje de error
+                function closeMessageBox() {
+                    document.getElementById('messageBox').style.display = 'none';
+                }
+				
+				function goBackAndClose(url) {
+					window.location.href = url;
+				}				
+           </script>
+            
+            <h2 class="mt-5 mb-3">Pasos a seguir</h2>
+            <div id="paso1" class="paso" style="display:block;">
+                <p>Definir el tipo de evento</p>
+                <ul>
+                    <li>Cada lectura de temperatura se representa como un evento</li>
+                    <li>Uso del esquema <strong>SCHEMA</strong></li>
+                    <li>Un evento debe definirse con: campos, tipos de datos</li>
+                    <li>Ejemplo: <strong>create schema EventoSimple(objeto String, valor Integer);</strong></li>
+                </ul>
+                <button onclick="mostrarPaso('paso2')">➡️ Siguiente</button>
+            </div>
+
+            <div id="paso2" class="paso" style="display:none;">
+                <p>Asociar nombres a las consultas</p>
+                <ul>
+                    <li>Identificar los diferentes patrones</li>
+                    <li>Uso de anotaciones <strong>@Name</strong></li>
+                    <li>Ejemplo: <strong>@Name('Patron1')</strong></li>
+                </ul>
+				<button onclick="mostrarPaso('paso3')">➡️ Siguiente</button>
+            </div>
+            
+            <div id="paso3" class="paso" style="display:none;">
+                <p>Extraer data de los eventos simples que llegan en tiempo real</p>    
+                <ul>
+                    <li>Uso de seleccion o consulta <strong>SELECT</strong></li>
+                    <li>Filtrar eventos según condiciones, Agrupar datos en el tiempo, Detectar patrones, Calcular promedios, conteos, etc</li>
+                    <li>Ejemplo: <strong>select * from EventoSimple;</strong></li>
+                </ul>
+				<button onclick="mostrarPaso('paso4M')">➡️ Siguiente</button>
+            </div>
+
+            <div id="paso4M" class="paso" style="display:none;">
+                <p>Evento complejo <strong>MONITOR</strong></p>
+                <p>Saber el promedio de temperatura cada cierto tiempo</p>
+                <ul>
+                    <li>Usar ventanas temporales para agrupar eventos cada cierto tiempo (ej. cada XX segundos).</li>
+                    <li>Usar funciones de agregación como <strong>avg()</strong>.</li>
+                </ul>                
+                <button onclick="mostrarPaso('paso4W')">➡️ Siguiente evento</button>
+            </div>    
+            
+            <div id="paso4W" class="paso" style="display:none;">
+                <p>Evento complejo <strong>WARNING</strong></p>
+                <p>Detectar si se registran dos temperaturas consecutivas por encima de un umbral</p>
+                <ul>
+                    <li>Introducir patrones de eventos con <strong>pattern</strong>.</li>
+                    <li>Usar condiciones dentro del patrón.</li>
+                </ul>                    
+                <button onclick="mostrarPaso('paso4C')">➡️ Siguiente evento</button>
+            </div>    
+            
+            <div id="paso4C" class="paso" style="display:none;">
+                <p>Evento complejo <strong>CRITICAL</strong></p>
+                <p>Detectar una secuencia de 4 eventos donde cada uno es mayor que el anterior, y el último es 1.5 veces mayor que el primero</p>
+                <ul>
+                    <li>Introducir patrones de eventos con <strong>pattern</strong>.</li>
+                    <li>Uso de múltiples variables en el patrón (a1, a2, a3, a4).</li>
+                    <li>Usar comparaciones entre los eventos (a2.valor > a1.valor).</li>
+                </ul>                    
+                <button onclick="attemptShowPaso5()">➡️ Siguiente</button> 
+            </div>        
+
+            <div id="paso5" class="paso" style="display:none;">
+                <p>Creación de un flujo de eventos</p>
+                <ul>
+                    <li>Enviar los resultados de una consulta o patrón a un nuevo flujo de eventos</li>
+                    <li>Uso del <strong>INSERT INTO</strong></li>
+                    <li>Ejemplo: <strong>insert into NuevoEvento
+                        select * from EventoSimple where valor > 100;</strong></li>
+                </ul>
+	            <p>¡Listo para practicar!  Haz click en el link. En la pagina de practica tendras un <strong>ChatBot Tutor</strong></p>
+                <div id="practica-link-container" class="text-center mt-5" style="display:none;">
+                         <a href="{{ url_for('practica_epl', case_id=1, student_name=user.nombres) }}"
+					   target="_blank"	 
+                       id="linkPracticaEPL"
+                       class="btn btn-primary btn-lg disabled-link">➡️ Ir a la Práctica</a>
+                </div>				
+            </div>
+
+			<div class="row mt-5 mb-5">
+				<div class="col-md-10 offset-md-1 text-center mt-5">
+					<hr>
+					<button onclick="goBackAndClose('{{ url_for('estudiante_pagina') }}')" 
+							class="btn btn-info btn-lg mt-3">
+						Volver al Panel de Estudiante
+					</button>
+				</div>
+			</div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Message Box for Alerts -->
+<div id="messageBox" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    text-align: center;
+    max-width: 400px;
+">
+    <p id="messageText" style="margin-bottom: 15px; color: #333;"></p>
+    <button onclick="closeMessageBox()" style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    ">Entendido</button>
+</div>
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Profesor{% endblock %}
+
+{% block content %}
+    <h1>Bienvenido, Profesor {{ user.nombres }}!</h1>
+    <p>Este es tu panel de control como profesor.</p>
+    <p>Tu usuario: {{ user.usuario }}</p>	
+    <p>Tu correo: {{ user.correo }}</p>
+    <p>Tu rol: {{ user.rol }}</p>
+	
+	<a href="{{ url_for('ver_historial') }}" class="btn btn-primary">Ver historial de actividades</a>
+	
+{% endblock %}

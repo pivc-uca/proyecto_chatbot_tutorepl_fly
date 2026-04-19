@@ -1,0 +1,21 @@
+app = "rasa-actions"  # nombre que elijas
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  URL_APP = "https://flask-app.fly.dev"
+  URL_ARCHIVOS = "https://flask-app.fly.dev/static/archivos"
+  
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]

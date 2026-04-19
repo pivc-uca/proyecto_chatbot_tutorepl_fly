@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+    <h1>Registrarse</h1>
+    <form method="POST">
+        {{ form.csrf_token }} {# Esto es importante para seguridad con Flask-WTF #}
+        <p>
+            {{ form.nombres.label }}<br>
+            {{ form.nombres(size=50) }}
+            {% for error in form.nombres.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.apellidos.label }}<br>
+            {{ form.apellidos(size=50) }}
+            {% for error in form.apellidos.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>		
+        <p>
+            {{ form.usuario.label }}<br>
+            {{ form.usuario(size=50) }}
+            {% for error in form.usuario.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.correo.label }}<br>
+            {{ form.correo(size=100) }}
+            {% for error in form.correo.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.clave.label }}<br>
+            {{ form.clave(size=20) }}
+            {% for error in form.clave.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.confirmar_clave.label }}<br>
+            {{ form.confirmar_clave(size=20) }}
+            {% for error in form.confirmar_clave.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.rol.label }}<br>
+            {{ form.rol() }}
+            {% for error in form.rol.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

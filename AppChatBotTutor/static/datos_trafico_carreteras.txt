@@ -1,0 +1,26 @@
+t = "2019-02-20 10:00:00.000"  
+
+CarEvent={carId=1, timestamp=1550656800, speed=70, wheelPressure1=3.1, wheelPressure2=3.1, wheelPressure3=3.1, wheelPressure4=3.1, seat1=true, seat2=true, seat3=true, seat4=true}
+
+t=t.plus(10 min)
+
+CarEvent={carId=1, timestamp=1550657400, speed=70, wheelPressure1=2.7, wheelPressure2=3, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=true}
+
+CarEvent={carId=2, timestamp=1550657400, speed=70, wheelPressure1=2.7, wheelPressure2=3, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=true}
+
+CarEvent={carId=1, timestamp=1550657400, speed=60, wheelPressure1=2.8, wheelPressure2=3.1, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=true}
+
+t=t.plus(4 sec)
+
+CarEvent={carId=1, timestamp=1550657404, speed=65, wheelPressure1=2.8, wheelPressure2=1.2, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=true}
+
+CarEvent={carId=1, timestamp=1550657404, speed=60, wheelPressure1=2.8, wheelPressure2=3, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=true}
+
+t=t.plus(2 sec)
+
+CarEvent={carId=1, timestamp=1550657406, speed=0, wheelPressure1=2.8, wheelPressure2=3, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=false}
+
+
+t=t.plus(3 sec)
+
+CarEvent={carId=2, timestamp=1550657409, speed=0, wheelPressure1=2.8, wheelPressure2=3, wheelPressure3=2.9, wheelPressure4=1.9, seat1=true, seat2=true, seat3=true, seat4=false}

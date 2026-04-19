@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Actividades{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Historial de Actividades</h1>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Actividad</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item, nombre, apellido in historial %}
+        <tr>
+            <td>{{ item.id_his }}</td>
+            <td>{{ nombre }} {{ apellido }}</td>
+            <td>{{ item.actividad }}</td>
+            <td>{{ item.fecha }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('profesor_pagina') }}" class="btn btn-secondary mt-3">Volver al panel</a>
+
+{% endblock %}
+

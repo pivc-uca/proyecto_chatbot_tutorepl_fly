@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Estudiante{% endblock %}
+
+{% block content %}
+<h1>Bienvenido, Estudiante {{ user.nombres }}!</h1>
+<p>Este es tu panel de control como estudiante.</p>
+<p>Tu usuario: {{ user.usuario }}</p>
+<p>Tu correo: {{ user.correo }}</p>
+<p>Tu rol: {{ user.rol }}</p>
+
+
+<h2>Entendiendo Procesamiento de Eventos Complejos (CEP)</h2>
+<p>
+	 Procesamiento de Eventos Complejos (Complex Event Processing, CEP), es una tecnología emergente que permite procesar, analizar y correlacionar grandes cantidades de eventos simples, al detectar patrones de eventos y responder en tiempo real a situaciones críticas o relevantes del negocio, en lugar de solo procesar datos estáticos.
+</p>
+<p>
+    El <strong>Lenguaje de Procesamiento de Eventos (Event Processing Language, EPL)</strong> es la forma de programar, la definición de tipos de eventos y patrones de eventos. Los patrones de eventos inferirán nuevos eventos más complejos (situaciones) con mayor significado semántico.
+</p>
+<div style="text-align: center; margin-bottom: 30px;">
+    <img src="{{ url_for('static', filename='imagenes/cep-epl.png') }}" 
+         alt="Diagrama de flujo del Procesamiento de Eventos Complejos (CEP)."
+         style="max-width: 80%; height: auto; border: 1px solid #ccc; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);">
+</div>
+<h2>Escenarios de Aplicación</h2>
+<p>
+    La capacidad de EPL para procesar y reaccionar a eventos en tiempo real lo hace invaluable en una amplia variedad de dominios. Algunos de los escenarios de aplicación más comunes incluyen:
+</p>
+<ul>
+    <li>
+        <strong>Bolsa:</strong> Permite la compra y venta automática de acciones o activos financieros, detectando patrones de mercado o condiciones predefinidas en fracciones de segundo para ejecutar operaciones de alta frecuencia.
+    </li>
+    <li>
+        <strong>Comercio:</strong> Fundamental para detectar compras fraudulentas al analizar patrones inusuales en las transacciones, como múltiples compras grandes desde diferentes ubicaciones geográficas en un corto lapso.
+    </li>
+    <li>
+        <strong>Internet de las Cosas (IoT) y Ciudades Inteligentes:</strong> Se utiliza para procesar en tiempo real los datos provenientes de miles de sensores (temperatura, tráfico, calidad del aire, energía, etc.), generando alarmas instantáneas o activando acciones sobre actuadores (ej. ajustar luces de la calle, controlar el flujo de agua).
+    </li>
+    <li>
+        <strong>Seguridad Informática:</strong> Capaz de detectar ataques de seguridad en sistemas informáticos al identificar patrones sospechosos de actividad en la red o en los registros (logs), como intentos fallidos de inicio de sesión repetidos o accesos inusuales.
+    </li>
+</ul>
+
+<h2>Casos de Estudios</h2>
+<p>
+    Hemos preparado tres casos de estudio para que explores cómo se aplica EPL en diferentes escenarios. Por favor, selecciona el caso que más te interese para continuar.
+</p>
+
+<div class="case-studies-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+    <div class="case-study-item" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+        <h3>Caso de Estudio 1: Nivel principiante - Planta de Energia Nuclear</h3>
+<p>
+    En este escenario, trabajaremos con una planta de energía nuclear que necesita mantener bajo control la temperatura de su núcleo. El objetivo es aprender a construir consultas EPL (Event Processing Language) que nos permitan detectar situaciones. Este caso está diseñado para principiantes, guiando paso a paso en el uso de EPL.
+</p>		
+        <button class="select-case-button" data-case-id="1" data-case-name="Planta de Energia Nuclear" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Seleccionar
+        </button>
+    </div>
+
+    <div class="case-study-item" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+        <h3>Caso de Estudio 2: Nivel intermedio - Trafico de Carreteras</h3>
+<p>
+    En este escenario, se monitorean sensores instalados en un coche. Este caso de nivel intermedio, plantea desafíos con menor acompañamiento, promoviendo que el estudiante aplique conceptos aprendidos y experimente con condiciones más complejas.
+</p>		
+        <button class="select-case-button" data-case-id="2" data-case-name="Trafico de Carreteras" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Seleccionar
+        </button>
+    </div>
+
+    <div class="case-study-item" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+        <h3>Caso de Estudio 3: Nivel avanzado - Libre guiado por IA</h3>
+<p>
+    En este caso avanzado, el estudiante puede construir consultas EPL de forma libre, sin un guion preestablecido. Donde el aprendizaje ocurre mediante la exploración activa, el ensayo y error, con el apoyo puntual de una IA que funciona como tutor inteligente.
+</p>
+<p>¡Listo para practicar!  Haz click en el boton. Se abrira la pagina EsperTech Esper EPL Online, allí tendras el <strong>ChatBot TutorEPL</strong></p>
+	
+        <button class="select-case-button" data-case-id="3" data-case-name="Libre guiado por IA" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Practicar
+        </button>
+    </div>
+</div>	
+
+<p id="selection-message" style="margin-top: 20px; color: #007bff; font-weight: bold;"></p>
+
+<script>
+    const userId = "{{ user.id_usu }}"; 
+	console.log("UserId: ", userId);
+
+    // Variables globales para los elementos del DOM
+    let selectCaseButtons = null;
+    let selectionMessage = null;
+	let caseId = null;
+
+    window.onload = () => {
+        selectCaseButtons = document.querySelectorAll(".select-case-button");
+        selectionMessage = document.getElementById("selection-message");
+
+        // Lógica para los casos de estudio
+        selectCaseButtons.forEach(button => {
+            button.addEventListener("click", async (event) => {
+                caseId = event.currentTarget.dataset.caseId;
+                const caseName = event.currentTarget.dataset.caseName;
+				const p_actividad = `Seleccionado el caso de estudio ID : ${caseId}`;
+                console.log(`Seleccionado el caso de estudio ID: ${caseId}, Nombre: ${caseName}`);
+
+                selectionMessage.textContent = `Has seleccionado: "${caseName}". Guardando tu elección...`;
+
+                try {
+                    const response = await fetch('/api/guardar_historial', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            actividad: p_actividad
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        selectionMessage.textContent = `¡Tu elección "${caseName}" ha sido guardada con éxito!.`;
+                        console.log("Selección guardada:", data);
+
+                        // Deshabilitar botones después de la selección para evitar múltiples envíos
+                        selectCaseButtons.forEach(btn => btn.disabled = true);
+						
+						if (caseId == 3) {
+							// Página practica.
+							const studentName = {{ user.nombres | tojson }}; 
+							const url = "{{ url_for('validar_extension') }}"; 
+							const finalUrl = `${url}?case_id=3&student_name=${encodeURIComponent(studentName)}`; 
+							window.open(finalUrl, "_blank");
+						}
+						else {
+							// Nueva página con el payload de selección.
+							window.location.href = `/caso/${caseId}`;
+						}
+                        
+                    } else {
+                        const errorData = await response.json();
+                        selectionMessage.textContent = `Error al guardar la elección: ${errorData.message || 'Error desconocido'}`;
+                        console.error("Error al guardar la selección:", response.status, errorData);
+                    }
+                } catch (error) {
+                    selectionMessage.textContent = `Error de red al guardar la elección.`;
+                    console.error("Error de red al enviar la selección:", error);
+                }
+            });
+        });
+    };
+</script>
+{% endblock %}

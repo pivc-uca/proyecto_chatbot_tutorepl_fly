@@ -1,0 +1,586 @@
+version: '3.1'
+intents:
+- ayuda_error_anotacion
+- ayuda_error_insert
+- ayuda_error_schema
+- ayuda_error_select_critical
+- ayuda_error_select_monitor
+- ayuda_error_select_warning
+- ayuda_error_select_explosion_rueda
+- ayuda_error_select_colision
+- ayuda_error_select_ocupante_abandona_asiento
+- ayuda_error_select_accidente_ocupante_despedido
+- ayuda_implementacion_caso
+- explicar_sintaxis_select
+- explicar_funcion_agregacion
+- explicar_ventanas
+- explicar_ventanas_tiempo
+- explicar_patron
+- conceptos_basicos
+- consulta_sintaxis
+- datos_caso
+- despedida
+- epl_online
+- error_anotacion
+- error_datos
+- error_insert
+- error_schema_1
+- error_schema_2
+- error_schema_3
+- error_select_critical
+- error_select_monitor
+- error_select_warning
+- error_select_explosion_rueda
+- error_select_colision
+- error_select_ocupante_abandona_asiento
+- error_select_accidente_ocupante_despedido
+- explicar_sintaxis_select_monitor
+- explicar_sintaxis_select_warning
+- explicar_sintaxis_select_critical
+- explicar_sintaxis_select_caso2
+- explicar_sintaxis_select_patron_caso2
+- explicar_sintaxis_select_caso2_oaa
+- explicar_sintaxis_select_patron_caso2_oaa
+- explicacion_epl_online
+- no_continuar
+- operadores_epl
+- planta_energia_nuclear
+- trafico_carretera
+- ventana_datos
+- inicio_sesion
+- error_epl_detectado
+- lista_llena_detectada
+entities:
+- caso_estudio
+- nombre_usuario
+- id_caso
+- error_epl
+slots:
+  caso_estudio:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: caso_estudio
+  id_caso:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: id_caso      
+  nombre_usuario:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: nombre_usuario
+  interaccion_ia:
+    type: bool
+    initial_value: false
+    influence_conversation: true
+    mappings:
+    - type: custom
+  error_epl:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: error_epl     
+responses:
+  utter_saludo_personalizado:
+  - text: "¡Hola, **{nombre_usuario}**! Encantado de verte de nuevo. ¿En qué puedo ayudarte hoy?"
+  - text: "¿Qué tal, **{nombre_usuario}**? Estoy aquí para ayudarte."  
+  - text: "¡Hola, **{nombre_usuario}**! Qué bueno tenerte de vuelta. ¿Listo para seguir con la práctica de EPL?"
+  - text: "¿Qué tal, **{nombre_usuario}**? Estoy a tu disposición para cualquier duda sobre el caso de estudio."
+  - text: "¡Bienvenido, **{nombre_usuario}**! Comencemos con la sesión. Dime, ¿en qué puedo orientarte hoy?"
+  - text: "Hola, **{nombre_usuario}** con gusto te apoyaré en tu aprendizaje de EPL. ¿Qué tienes en mente para hoy?"
+  - text: "¡Gusto en verte, **{nombre_usuario}**! Aquí tienes a tu tutor listo para trabajar. ¿Por dónde empezamos?"
+  - text: "Hola de nuevo, **{nombre_usuario}**. Estoy listo para ayudarte a construir tus consultas EPL. ¿Qué necesitas?"  
+  utter_despedida_con_nombre:
+  - text: "¡Hasta luego, {nombre_usuario}! Fue un placer ayudarte."
+  - text: "¡Hasta pronto, **{nombre_usuario}**! Sigue practicando tus consultas EPL, vas por buen camino."
+  - text: "¡Nos vemos, **{nombre_usuario}**! Estaré aquí si surge alguna otra duda."
+  - text: "¡Excelente trabajo hoy, **{nombre_usuario}**! Que tengas un gran día."
+  - text: "Terminamos por ahora, **{nombre_usuario}**. ¡No dejes de experimentar!"
+  - text: "¡Chao, **{nombre_usuario}**! Fue un gusto apoyarte en esta sesión de aprendizaje."
+  - text: "¡Hasta luego, **{nombre_usuario}**! Recuerda que la práctica hace al maestro en EPL."
+  - text: "¡Adiós, **{nombre_usuario}**! Aquí estaré cuando necesites consultar de nuevo con el experto."  
+  utter_planta_nuclear:
+  - image: ./imagenes/planta_nuclear.jpg
+    text: |
+      La central eléctrica tiene un NUCLEO, si se calienta demasiado, suceden cosas muy malas, tenemos medidores de temperatura ¿termómetros? que toman una lectura de la temperatura cada segundo y envían los datos a un sistema de monitoreo central.
+      Necesitamos recibir notificaciones cuando se detecten 3 tipos de eventos complejos:
+      - **Monitor**: la temperatura promedio cada X segundos, para fines informativos
+      - **Warning**: AVISARNOS si tenemos 2 temperaturas consecutivas por encima de un determinado umbral.
+      - **Critical**: ALERTARNOS si tenemos 4 eventos consecutivos, con el primero por encima de un cierto umbral, y cada uno posterior mayor que el último, y el último siendo 1,5 veces mayor que el primero. Esto intenta alertarnos de que tenemos un aumento repentino y creciente de la temperatura, que esto es algo muy malo.
+  utter_trafico_carretera:
+  - text: |
+      Sensores en un coche que miden:
+      - Presión de las ruedas.
+      - Velocidad del coche.
+      - Asiento ocupado o libre.
+      Tendremos los siguientes patrones:
+      - **PerdidaPresionRueda** : la presión de una rueda pasa a un valor donde disminuye en un tiempo 10 segundos.
+      - **ExplosionRueda** : la presión de una rueda pasa a un valor donde disminuye (50%) en un corto tiempo 5 segundos.
+      - **Colision** : la velocidad del coche superior a 50 km/h pasa a 0 km/h en  en un corto tiempo 3 segundos.
+      - **OcupanteAbandonaAsiento** : el asiento ocupado pasa a estar libre. 
+      - **AccidenteOcupanteDespedido** : se explota una rueda y,en los siguientes 3 segundos, se produce una colisión provocando que el ocupante abandone el asiento.
+    image: ./imagenes/trafico_carretera.jpg
+  utter_continuar_caso_estudio:
+  - text: Espero hayas entendido el caso de estudio **{caso_estudio}**.
+  utter_sin_caso_estudio:
+  - text: Has seleccionado la opcion Libre guiado por la IA, describe tu caso para que IA pueda crear los datos de tu caso
+  utter_ayuda_implementacion_planta_energia_nuclear:
+  - text: |
+      Para implementar el caso planta energia nuclear, los pasos a seguir son definir las siguientes sentecias:
+      1) definir esquema ** SCHEMA **, debemos definir qué datos tiene el evento TemperatureEvent, es decir Tiempo y Valor temperatura
+      2) definir anotacion ** ANNOTATIONS **, debemos definir el nombre por cada patron solicitado: Monitor, Warning, Critical
+      3) definir insercion del patron ** INSERT INTO **
+      4) definir seleccion de las propiedades del evento ** SELECT **
+      Del paso 2 a 4 se repetira por cada uno de los 3 patrones que tiene el caso
+  utter_ayuda_implementacion_trafico_carretera:
+  - text: |
+      Para implementar el caso trafico de carreteras, los pasos a seguir son definir las siguientes sentecias:
+      1) definir esquema ** SCHEMA ** , debemos definir qué datos tiene el evento CarEvent, es decir por cada sensor: Identificador carro, Tiempo, Presión de las ruedas (4), Velocidad del coche y Asiento ocupado o libre (4).
+      2) definir anotacion ** ANNOTATIONS **, debemos definir el nombre por cada patron solicitado: PerdidaPresion Rueda, Explosion Rueda, Colision, Ocupante Abandona Asiento y Accidente Ocupante Despedido	
+      3) definir insercion del patron ** INSERT INTO **
+      4) definir seleccion de las propiedades del evento ** SELECT **
+      Del paso 2 a 4 se repetira por cada uno de los 4 patrones que tiene el caso  
+  utter_datos_caso:
+  - text: "¡Claro, **{nombre_usuario}**! Aquí tienes los datos necesarios para este caso de {datos_detalle}"
+  - text: "Perfecto. Los parámetros para trabajar en este escenario son los siguientes {datos_detalle}"
+  - text: "Aquí tienes la información del caso, **{nombre_usuario}**. Úsalos para construir tus consultas EPL del {datos_detalle}"
+  - text: "Con gusto. Estos son los valores que debes considerar para tu análisis del {datos_detalle}"      
+  utter_datos_trafico_carreteras:
+  - text: |
+        Para descargar el archivo **.txt** con los datos del caso de estudio **{caso_estudio}**, haz clic en este enlace:
+        
+        [click aqui](http://localhost:8008/archivos/datos_trafico_carreteras.txt)
+        
+        Una vez descargado, copia y pega su contenido en el espacio **Time And Event Sequence**. Revisa si es necesario actualizar el nombre de los eventos antes de continuar.
+  utter_datos_planta_energia_nuclear:
+  - text: |
+        Para descargar el archivo **.txt** con los datos del caso de estudio **{caso_estudio}**, haz clic en este enlace:
+        
+        [Descargar archivo](http://localhost:8008/archivos/datos_planta_energia_nuclear.txt)
+        
+        Una vez descargado, copia y pega su contenido en el espacio **Time And Event Sequence**. Revisa si es necesario actualizar el nombre de los eventos antes de continuar.
+  utter_ha_sido_de_ayuda:
+  - text: ¿Ha sido de ayuda?
+  utter_conceptos_basicos1:
+  - text: El Lenguaje de Procesamiento de Eventos (EPL) es un lenguaje diseñado para procesar datos en tiempo real. Permite detectar patrones o ejecutar acciones automáticamente a medida que la información entra al sistema
+  utter_conceptos_basicos2:
+  - text: EPL es muy similar a SQL para que escribir consultas sea intuitivo. La gran diferencia es que, en lugar de consultar tablas estáticas, EPL analiza flujos de datos que no se detienen.
+  utter_conceptos_basicos3:
+  - text: En EPL usamos **ventanas** para agrupar eventos que llegan en distintos momentos. Mientras que SQL trabaja con datos históricos almacenados, EPL realiza consultas continuas sobre la marcha.
+  utter_continuar_conceptos_basicos:
+  - text: Para entender funcionamiento de EPL, tenemos casos de estudio, para ponernos en practica
+  utter_sintaxis_epl:
+  - text: |
+      Para escribir una expresión en EPL, debes seguir esta sintaxis: ...
+      
+      **ANNOTATIONS** Una anotación consta del nombre de la anotación y de parámetros de anotación opcionales. *annotation_name* es el nombre de clase simple o el nombre de clase completo de la clase de anotación. ***@Name("MyStatementName")***. Para mas informacion consulta (Esper ref. 5.2.7) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-syntax-annotation)
+      
+      **INSERT INTO** Creación de un flujo de eventos complejos (podrá formar parte de la implementación de otros patrones de evento. Para mas informacion consulta (Esper ref. 5.3.10) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-selecteventbean)
+      
+      **SELECT** Propiedades de eventos seleccionadas. Para mas informacion consulta (Esper ref. 2.2) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/processingmodel.html#processingmodel_basicselect)
+      
+      **FROM** Flujos de eventos requeridos. Para mas informacion consulta (Esper ref. 5.4) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-from-clause)
+      
+      **FROM PATTERN** Condiciones del patrón de eventos.
+      
+      **WHERE** Condiciones de filtrado de eventos. Para mas informacion consulta (Esper ref. 2.9) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/processingmodel.html#processingmodel_basicwhereclause)
+      
+      **GROUP BY** Expresiones de agrupación.
+      
+      **HAVING** Condiciones de agrupación.
+      
+      **ORDER BY** Expresiones de ordenación de eventos.
+      
+    image: ./imagenes/sintaxis_epl.jpg
+  utter_evento:
+  - text: |
+      "En EPL, los eventos son como estructuras de datos que describen lo que está ocurriendo en un momento determinado. Para trabajar con ellos, necesitas saber qué tipos de datos maneja y cómo se estructuran. Por lo tanto un evento es como un objeto o registro con campos. Se definen usando **create schema**."
+      
+      "Los tipos de datos determinan cómo escribes las consultas, cómo comparas datos y qué tipo de lógica puedes aplicar en tiempo real."
+  utter_sintaxis_schema:
+  - text: |
+      Utilizamos **CREATE SCHEMA** para declarar un tipo de evento
+        - Después del **CREATE SCHEMA** crear esquema sigue un **schema_name**. El nombre del esquema que indica el nombre del tipo de evento.
+        - Luego **property_name** es un identificador que proporciona el nombre de la propiedad del evento. 
+        
+      El **property_type** tipo de propiedad también es necesario para cada propiedad. 
+      
+      Los tipos de propiedad o datos, válidos se enumeran en:
+        • **STRING** Desde un solo carácter hasta un número ilimitado de caracteres. Los delimitadores válidos son comillas simples (') o dobles (").
+        • **BOOLEAN** Un valor booleano, true (verdadero) o false (falso).
+        • **INTEGER** Un valor entero (4 bytes).
+        • **LONG** Un valor largo (8 bytes).
+        • **DOUBLE** Un punto flotante IEEE 754 de 64 bits de doble precisión.
+        • **FLOAT** Un punto flotante IEEE 754 de 32 bits de precisión simple.
+        • **BYTE** Un entero de complemento a dos con signo de 8 bits.
+        
+      Siempre necesitamos tener definido el(los) esquema(s) sobre los datos que queremos aplicar el patrón.
+    image: ./imagenes/sintaxis_schema.jpg
+  utter_sintaxis_select:
+  - text: |
+      Aquí tienes la guía rápida para el apoyo de la construccion del **SELECT**
+        • **SELECT** - Propiedades de eventos seleccionadas. Para mas informacion consulta (Esper ref. 2.2) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/processingmodel.html#processingmodel_basicselect)
+        • **FROM** - Flujos de eventos requeridos. Para mas informacion consulta (Esper ref. 5.4) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-from-clause)
+        • **FROM PATTERN** - Condiciones del patrón de eventos. Para mas informacion consulta (Esper ref. 7.2.2) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/event_patterns.html#pattern-in-eql)
+        • **WHERE** - Condiciones de filtrado de eventos. Para mas informacion consulta (Esper ref. 5.5) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-where-clause)
+        • **GROUP BY** - Expresiones de agrupación. Para mas informacion consulta (Esper ref. 5.6.2) [click aqui](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl_clauses.html#epl-grouping-group-by)
+        • **HAVING** - Condiciones de agrupación.
+        • **ORDER BY** - Expresiones de ordenación de eventos.
+  utter_patrones: 
+  - text: |
+      Un patrón de eventos describe cómo se relacionan múltiples eventos en el tiempo. A diferencia de una simple consulta SELECT que opera sobre una ventana de eventos, los patrones permiten observar flujos dinámicos y relaciones temporales entre ellos.
+        Se usa con la sintaxis **pattern** dentro de select from pattern [...].
+        
+      Para mas informacion de los operadores, consultar ( Esper ref. 7.2.2 ) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/event_patterns.html#pattern-in-eql).        
+  utter_operadores_epl:
+  - text: |
+      Los operadores son elementos del lenguaje que te permiten construir expresiones para filtrar, comparar, agrupar y manipular datos dentro de las consultas. Son similares a los operadores en SQL, pero aplicados al contexto de eventos en tiempo real.       
+        • Operadores aritméticos   + , - , * , / , %  ( Esper ref. 9.1 )
+        
+        • Operadores de comparación    = , != , >= , > , <= , <  ( Esper ref. 9.2 )
+        
+        • Operadores lógicos x    and , or , not  ( Esper ref. 9.2 )
+        
+        • Operadores de concatenación    ||  ( Esper ref. 9.3 )
+        
+        • Operadores de binarios    & , | , ^  ( Esper ref. 9.4 ) 
+        
+      Para mas informacion de los operadores, consultar ( Esper ref. 9 ) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-operator.html).
+  utter_funcion_agregacion:
+  - text: |
+      Las función de agregación agrupa múltiples eventos para formar un único valor, basandose en los siguientes operadores. Para mas informacion consultar Esper ref 2.3 [click link](https://esper.espertech.com/release-8.8.0/reference-esper/html_single/index.html#processingmodel_basicaggregation) y ref 10.2 [click link](https://esper.espertech.com/release-8.8.0/reference-esper/html_single/index.html#epl-function-aggregation)
+        • avg
+        • count
+        • max
+        • min
+        • sum
+        
+      La agregación solo se permite con las cláusulas SELECT, GROUP BY y HAVING
+  utter_operadores_patron:
+  - text: |
+      Operadores de patrón:       
+        • **every** Selecciona cada evento que pertenece al tipo especificado.
+        
+        • **every-distinct(value)** Similar a every, pero elimina los resultados repetidos según la expresión value.
+        
+        • ** -> (followed-by)** Una expresión de patrón debe ser seguida por otra.
+        
+        • **[a:b]** Especifica el mínimo y máximo número de veces que una expresión de patrón debe ocurrir.
+        
+        • **[n]** Especifica el número de veces que una expresión de patrón debe ocurrir.
+        
+        • **until** Comprueba una expresión de patrón hasta que la condición se evalúa a verdadero.
+        
+        • **while** Comprueba una expresión de patrón mientras que la condición se evalúa a verdadero.
+        
+      Para mas informacion sobre operadores de patrón ( Esper ref 7.5 ) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/event_patterns.html#pattern-operators)
+  utter_every:
+  - text: |
+      Cuando se utiliza el operador **EVERY** que selecciona cada evento que pertenece al tipo especificado, con el operador  **->**  (followed-by), cada vez que el operador every se reinicia también inicia una nueva instancia de subexpresión buscando eventos en la subexpresión followed-by.       
+        Ejemplo de sintaxis **select e1.attribute, e2.attribute from pattern [every e1=EventType1 -> e2=EventType2]**
+        
+      Para mas informacion (Esper ref. 7.5.1) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/event_patterns.html#pattern-logical-every)
+  utter_guarda:
+  - text: |
+      El filtro GUARDA (guard) **timer:within (n times)** se evalúa a falso siSe evalúa a falso si la expresión del patrón no se ha cumplido durante el periodo de tiempo indicado (years, months, weeks, days, hours, minutes, seconds, milliseconds). Es decir, el patrón saltará solo si se cumplen sus condiciones antes del tiempo indicado por el timer. Es una guarda y no permite repetición.      
+        Ejemplo de sintaxis: ** select … from pattern [every ... -> … where timer:within (…)]**
+        
+      Para mas informacion ( Esper ref 7.5.9 ) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/event_patterns.html#pattern-guards)
+  utter_ventana_datos:
+  - text: |
+      Las ventanas de datos se pueden definir bien por número de eventos ó por tiempo, se trata de una agregación incremental donde:
+        - Las salidas de las ventanas es un subconjunto de eventos que se pueden utilizar después en otras cláusulas
+        
+        - Retienen los eventos a menos que haya una política de expiración o un borrado/eliminado de eventos.
+        
+        - Nunca duplican eventos y nunca sueltan eventos.
+        
+        - Mantienen el estado.
+        
+      Pueden ser de tipo deslizante (sliding) o de tipo batch (tumbling)
+      
+      Para mas información (Esper ref 14) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-views.html)
+  utter_ventana_por_numero:
+  - text: |
+      Las ventanas por número de eventos:
+        • **win:length_batch(size)** Ventana batch (tumbling) que retiene el número de eventos especificado (size). El evento complejo no se lanza hasta que se ha alcanzado dicho número de eventos. Estos eventos ya no se incluyen en la siguiente ventana. Para mas informacion (Esper ref 14.3.2) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-views.html#view-win-length-batch)
+        
+        • **win:length (size)** Ventana deslizante (sliding) según el número de eventos especificado (size). Se lanza cada vez que llega un evento, evaluando los últimos size eventos (si hay, size, y si no, los que haya). Los eventos sí se vuelven a incluir en las siguientes ventanas. Para mas informacion (Esper ref 14.3.1) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-views.html#view-win-length)
+  utter_ventana_por_tiempo:
+  - text: |
+      Las ventanas por tiempo:  
+        • **win:time_batch (n seconds)** Ventana bacth (tumbling) que retiene los eventos que se den según el periodo de tiempo especificado (years, months, weeks, days, hours, minutes, seconds, milliseconds). El evento complejo no se lanza hasta que pasa el periodo de tiempo y los eventos no se repiten en las siguientes ventanas. Para mas informacion (Esper ref 14.3.5) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-views.html#view-win-time-batch)
+        
+        • **win:time (n seconds)** Ventana deslizante (sliding) según los eventos que se den en el periodo de tiempo especificado (years, months, weeks, days, hours, minutes, seconds, milliseconds). Se lanza cada vez que llega un evento, evaluando los eventos ocurridos en los últimos n segundos (o unidad de tiempo elegida). Los eventos sí se vuelven a incluir en las siguientes ventanas. Según van llegando eventos va lanzando eventos complejos de salida. Para mas informacion (Esper ref 14.3.3) [click link](https://esper.espertech.com/release-8.9.0/reference-esper/html/epl-views.html#view-win-time)
+  utter_epl_online:
+  - text: |
+      La pagina **Esper EPL Online** (Espertech) tiene la siguiente estructura dividida en 3 partes :
+      
+      • **EPL Statements** : Para rellenar con las sentencias EPL.
+      
+      • **Time and Event Sequences**: Para rellenar con los eventos que son datos de entrada y el avance del tiempo, para crear una simulación.
+      
+      • **Scenario Results**: Donde se observaran los resultados.
+  utter_funcion_epl_online:
+  - text: ¿Quieres explicacion como hacer funcionar La pagina Esper EPL Online?
+    buttons:
+    - title: SI
+      payload: /explicacion_epl_online
+    - title: NO
+      payload: /no_continuar
+  utter_explicacion_epl_online:
+  - text: |
+        El funcionamiento de la pagina Esper EPL Online, se resume en los siguientes pasos:
+        
+        1.- Colocar en el cuadro **EPL Statements** las sentencias EPL de definiciones eventos, patrones
+        
+        2.- Luego debes presionar el boton **SUBMIT** para validarlas • Si existen errorres se abrira una ventana **Validation Failed** con el texto **Please check the EPL Module Text** donde se encuentra el mensaje del error relacionado con la definicion de EPL o **Advance Time and Send Events text** cuando el error se relaciona con los datos de simulacion.
+        
+        3.- Cuando ya no se presenten errores, se debe colocar en el cuadro **Time And Event Sequence** los valores de simulacion de los eventos que debes solicitar al **ChatBot**.
+       
+        4.- Luego debes presionar el boton **SUBMIT** para ejecutar • Si existen errorres se abrira una ventana **Validation Failed** con el texto **Please check the Advance Time and Send Events text** donde se encuentra el mensaje del error relacionado con los datos de simulacion.
+         
+        5.- Los resultados seran mostrados en el cuadro **Scenario Results** 
+  utter_ayuda_error_epl_online:
+  - text: Para que pueda ayudarte mejor con tus ejercicios practicos en la pagina EPL OnLine, si te aparece un **ERROR**, por favor, copia el mensaje de error de la ventana emergente y pégalo directamente aquí en el **ChatBot**. Así podré analizarlo y guiarte
+  utter_error_schema_1:
+  - text: Hay un error en la sintaxis al crear el esquema (schema) para el evento '{evento_epl}' falta la palabra clave, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_schema
+    - title: NO
+      payload: /no_continuar
+  utter_error_schema_2:
+  - text: Hay un error en la sintaxis al crear el esquema (schema) falta el nombre del esquema, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_schema
+    - title: NO
+      payload: /no_continuar
+  utter_error_schema_3:
+  - text: Hay un error en la sintaxis al crear el esquema (schema) falta definir lo(s) atributo(s) y tipo(s) del atributo, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_schema
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_schema:
+  - text: Ejemplo sintaxis de definicion del esquema (SCHEMA) **create schema EventType1(attribute type);**
+  utter_error_anotacion:
+  - text: Hay un error en la sintaxis al crear la ANOTACION  @Name, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_anotacion
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_anotacion:
+  - text: Ejemplo sintaxis de definición ANOTACION **@Name("XXXXX")** , donde XXXX indica nombre nuevo patrón
+  utter_error_insert:
+  - text: Hay un error en la sintaxis INSERT, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_insert
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_insert:
+  - text: |
+      Cuando queremos que la salida de un patrón sea a la vez un nuevo evento entrante al flujo de eventos de modo que lo podamos detectar en otro patrón. 
+      Ejemplo sintaxis de definicion de INSERT
+      @Name(“…")
+      **insert into NombreNuevoEvento**
+      select …
+      from …
+  utter_error_select_monitor:
+  - text: Hay un error en la sintaxis del SELECT para el patron MONITOR, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_monitor
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_select_monitor:
+  - text: |
+      El patrón **MONITOR** a construir consiste en utilizar una ventana temporal de tiempo para calcular un valor promedio, para lo cual usaremos **Operadores de agregación** y **Ventana de datos por tiempo**
+      
+        • Lo primero, (FROM) se define una ventana por lotes de tiempo (time batch window) **WIN:TIME_BATCH** de XX segundos. Esto significa que cada XX segundos, se agruparán todos los eventos TemperatureEvent que hayan llegado en ese periodo, y se procesarán como un lote.
+        
+        • Lo segundo, (SELECT) para cada lote de XX segundos, se calculará el promedio del campo **AVG** de todos los eventos a1 (es decir, todos los TemperatureEvent que llegaron en esa ventana). El resultado se emitirá una vez por cada lote, es decir, cada XX segundos.
+  utter_continuar_select_monitor:
+  - text: "Ver explicacion sintaxis SELECT"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_monitor
+  utter_continuar_select_monitor_funcion_agregacion:
+  - text: "Ver explicacion función de agregación"
+    buttons:
+    - title: Continuar
+      payload: /explicar_funcion_agregacion
+  utter_continuar_select_monitor_ventana:
+  - text: "Ver explicacion ventana de datos"
+    buttons:
+    - title: Continuar
+      payload: /explicar_ventanas
+  utter_continuar_select_monitor_ventana_tiempo:
+  - text: "Ver explicacion ventana de datos por tiempo"
+    buttons:
+    - title: Continuar
+      payload: /explicar_ventanas_tiempo       
+  utter_error_select_warning:
+  - text: Hay un error en la sintaxis del SELECT para el patron WARNING, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_warning
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_select_warning:
+  - text: |
+      La intención del patron **WARNING** es detectar patrones secuenciales de eventos que cumplan cierta condición.
+      
+      Lo primero, se está buscando un patrón secuencial donde (PATTERN), usando la palabra clave **EVERY** indica que este patrón se busca repetidamente en el flujo de eventos. Es decir, no se detiene tras encontrar una coincidencia, sigue buscando desde el siguiente evento.
+        • Primero ocurra un evento a1 de tipo TemperatureEvent con valor > XXX, y luego
+        • Ocurra otro evento a2 también de tipo TemperatureEvent con value > YYY.
+        
+      Lo segundo, una vez que el patrón es detectado, se seleccionan (SELECT)
+        • El timestamp del segundo evento (a2)
+        • El valor del primer evento (a1.value)
+        • El valor del segundo evento (a2.value)
+  utter_continuar_select_warning:
+  - text: "Ver explicacion sintaxis SELECT"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_warning        
+  utter_continuar_select_patron:
+  - text: "Ver explicacion patron **pattern**"
+    buttons:
+    - title: Continuar
+      payload: /explicar_patron
+  utter_error_select_critical:
+  - text: Hay un error en la sintaxis del SELECT para el patron CRITICAL, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_critical
+    - title: NO
+      payload: /no_continuar
+  utter_ayuda_error_select_critical:
+  - text: |
+      El patrón **CRITICAL** es un ejemplo avanzado de detección de una secuencia ascendente de eventos de temperatura con una condición final adicional.
+      
+      La consulta (PATTERN) está buscando detectar una secuencia de 4 eventos consecutivos (a1 → a2 → a3 → a4) donde cada evento representa una temperatura creciente, y el último (a4) debe superar un umbral adicional.
+        • Se detecta un primer evento (a1) con valor mayor a XX.
+        • El siguiente evento (a2) debe tener un valor mayor que el de a1.
+        • El tercer evento (a3) debe tener un valor mayor que el de a2.
+        • El cuarto evento (a4) debe tener un valor mayor que el de a3 y adicionalmente ser al menos un 50% mayor que el valor de a1.
+        
+      El (SELECT) si la cadena de eventos ocurre, se emite el evento a4 su contenido (valor, timestamp, etc.).
+  utter_continuar_select_critical:
+  - text: "Ver explicacion sintaxis SELECT"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_critical 
+  utter_error_select_explosion_rueda:
+  - text: Hay un error en la sintaxis del SELECT para el patron EXPLOSION RUEDA, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_explosion_rueda
+    - title: NO
+      payload: /no_continuar      
+  utter_ayuda_error_select_explosion_rueda:
+  - text: |
+      El patrón simple **Explosion Rueda** a construir consiste en supervisar la seguridad de las ruedas comparando dos eventos sucesivos de un mismo vehículo.
+        Usaremos el operador de patron **EVERY** y entender la lógica del "Estado A -> Estado B" **(followed-by)**
+      Aquí te explico cómo funciona paso a paso:
+        - Identificación del Vehículo: El sistema se mantiene atento a cada evento de un coche. Cuando recibe uno, guarda los datos de presión iniciales como referencia.
+        - La Condición Crítica: El patrón se activa si, tras ese primer evento, llega un segundo reporte del mismo coche donde la presión de cualquiera de las cuatro ruedas cae drásticamente (a menos de la mitad de lo que marcaba originalmente).
+        - El Factor Tiempo (La Guarda): Para que se considere una "explosión" y no una pérdida de aire gradual, este cambio brusco debe ocurrir en un intervalo de máximo 2 segundos.
+  utter_error_select_colision:
+  - text: Hay un error en la sintaxis del SELECT para el patron COLISION, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_colision
+    - title: NO
+      payload: /no_continuar      
+  utter_ayuda_error_select_colision:
+  - text: |
+      El patrón simple **Colision** a construir consiste en identificar una parada de emergencia o impacto basándose en una pérdida de velocidad radical y repentina.
+      Usaremos el operador de patron **EVERY** y entender la lógica del "Estado A -> Estado B" **(followed-by)**
+      Se divide en tres fases lógicas:
+        - Condición de Inicio (Estado A): El sistema se "activa" únicamente cuando detecta un coche circulando a una velocidad considerable (superior a 50 km/h). Si el coche va más lento, el sistema ignora el evento para evitar falsas alarmas.
+        - El Cambio Drástico (Estado B): Tras detectar el coche a alta velocidad, el patrón busca un segundo evento del mismo vehículo (a.carId = b.carId) donde la velocidad haya caído a 0 km/h (o menos, por margen de seguridad).
+        - La Ventana Crítica (Timer): Para que se registre como una colisión y no como un frenado normal en un semáforo, esta transición de ">50" a "0" debe ocurrir en un intervalo máximo de 3 segundos.
+  utter_error_select_ocupante_abandona_asiento:
+  - text: Hay un error en la sintaxis del SELECT para el patron OCUPANTE ABANDONA ASIENTO, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_ocupante_abandona_asiento
+    - title: NO
+      payload: /no_continuar      
+  utter_ayuda_error_select_ocupante_abandona_asiento:
+  - text: |
+      El patrón simple **Ocupante Abandona Asiento** a construir consiste en detectar el momento exacto en que una persona se levanta de un asiento que previamente estaba ocupado. La lógica se basa en comparar el "antes" y el "después" de los sensores presencia del asiento (son 4 sensores).
+        - Usaremos el operador de patron **EVERY** y entender la lógica del "Estado A -> Estado B" **(followed-by)**
+        - Detección de Asiento Ocupado (Estado A): El sistema se activa cuando detecta que al menos uno de los cuatro asientos del coche está ocupado (true). En este punto, el patrón "etiqueta" ese estado inicial para compararlo más tarde.
+        - El Cambio a "Libre" (Estado B): El patrón espera a que llegue un nuevo evento del mismo vehículo donde ocurra una transición específica: un asiento que estaba en true (ocupado) pase a estar en false (libre).
+  utter_error_select_accidente_ocupante_despedido:
+  - text: Hay un error en la sintaxis del SELECT para el patron ACCIDENTE OCUPANTE DESPEDIDO, quieres ayuda con la sintaxis
+    buttons:
+    - title: SI
+      payload: /ayuda_error_select_accidente_ocupante_despedido
+    - title: NO
+      payload: /no_continuar      
+  utter_ayuda_error_select_accidente_ocupante_despedido:
+  - text: |
+      El patrón complejo **Accidente Ocupante Despedido** a construir consiste en una cadena de eventos correlacionados, no busca un solo suceso, sino una reacción en cadena de tres situaciones que ocurren para confirmar un accidente grave donde: El Detonante **(Explosión de Rueda)**, la Consecuencia Inmediata **(Colisión)** y el Resultado Crítico **(Ocupante Abandona Asiento)**.
+        - Usaremos el operador de patron **EVERY** y entender la lógica de las secuencias "Patrón E → Patrón C → Patrón O" **(followed-by)**.
+        - La Ventana de Tiempo **(La Guarda)**: Para que el sistema considere que estos tres eventos están relacionados como un solo accidente, toda la secuencia (Explosión → Choque → Salida) debe ocurrir en un máximo de 5 segundos.      
+  utter_continuar_select_caso2:
+  - text: "Ver explicacion sintaxis SELECT y operadores"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_caso2  
+  utter_continuar_select_patron_caso2:
+  - text: "Ver explicacion patron **pattern**"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_patron_caso2   
+  utter_continuar_select_caso2_oaa:
+  - text: "Ver explicacion sintaxis SELECT y operadores"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_caso2_oaa     
+  utter_continuar_select_patron_caso2_oaa:
+  - text: "Ver explicacion patron **pattern**"
+    buttons:
+    - title: Continuar
+      payload: /explicar_sintaxis_select_patron_caso2_oaa        
+  utter_error_datos:
+  - text: Hay un error o problema en la ventana **Advance Time and Send Events** donde se van colocados los datos de los eventos en el tiempo simulado. Por favor, revisa el formato de tus eventos y los intervalos de tiempo
+  utter_ayuda_error_datos:
+  - text: |
+      Puedes solicitarme el archivo con los datos de simulacion para tu caso de estudio
+      La estructura debe ser un evento del tipo definido en **SCHEMA** con su respectiva estructura, avanzando en el tiempo los eventos con timestamp, como por ejemplo
+          **StockTick={{symbol='GE', price=20.5}}** --> Evento
+          **t=t.plus(5 seconds)** --> Avance de tiempo
+          **StockTick={{symbol='YHOO', price=65}}** --> Evento
+  utter_no_continuar:
+  - text: Perfecto, recuerda que aqui estoy para apoyarte con dudas o ayudas que requieras.
+  utter_reformular:
+  - text: Perdona, no te he entendido... ¿podrías repetirlo de otra manera para que pueda entenderte?
+  - text: Creo que no te he entendido, ¿podrías repetirlo de otra forma?
+  - text: Vaya, no he entendido eso, ¿podrías repetirlo de otra manera para que pueda entenderte?
+  - text: No te he entendido, por favor ¿podrías repetirlo de otra forma?
+  utter_lista_llena_detectada:
+  - text: Felicitaciones **{nombre_usuario}** tu ventana de resultados indica que se ha resuelto satisfactoriamente el caso de estudio **{caso_estudio}**.
+actions:
+- action_preguntar_ia
+- action_ayuda_implementacion_caso
+- action_datos_caso
+- action_seleccionar_caso
+- action_procesar_error_epl
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: false

@@ -1,0 +1,17 @@
+# No enviar el historial de Git al contenedor
+.git
+.gitignore
+
+# Ignorar datos locales de entrenamiento y logs
+.rasa/
+*.log
+*.db
+
+# Ignorar entornos virtuales (el Docker instalará los suyos propios)
+venv/
+env/
+__pycache__/
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db

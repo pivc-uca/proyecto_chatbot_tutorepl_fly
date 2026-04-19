@@ -1,0 +1,387 @@
+{% extends "base_practica.html" %}
+
+{% block title %}Práctica EPL Online{% endblock %}
+
+{% block content %}
+<style>
+	main {
+		max-width: 100%;
+		margin: 0;
+		padding-left: 20px;
+        padding-right: 60px; /* espacio solo para el chatbot */
+		background-color: white;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	}
+    /* Estilos para el iframe de la herramienta EPL (Visible y de gran tamaño) */
+    #learning-iframe {
+        display: block; 
+        width: 90%;
+        height: 600px; /* Gran área para la herramienta */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+    .container {
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }	
+</style>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8"> 
+            <h2 class="mb-4 text-center">Herramienta de Práctica EPL</h2>
+				<p class="lead text-center">
+					¡Bienvenido a la sesión de práctica, {{ student_name }}! Estás trabajando en el <b>Caso de Estudio {{ case_id }}</b>.
+				</p>
+				<p class="text-center">
+					Aquí puedes construir tu caso de estudio EPL en tiempo real. Para dudas o consultas <b>ChatBot EplTutor</b> te guiará.
+				</p>        
+            <iframe id="learning-iframe" src="https://esper-epl-tryout.appspot.com/epltryout/mainform.html"></iframe>
+
+            <div id="error-message-output" class="mt-4"></div>
+        </div>
+
+        <div class="col-md-4">
+            <h2 class="mb-4 text-center">BotEplTutor</h2>
+            <div class="chatbot-container">
+                <rasa-chatbot-widget
+                    server-url="{{ rasa_url }}"
+					auto-open="true"
+                    initial-payload='/inicio_sesion{"nombre_usuario":"{{ user.nombres | e }}", "id_caso": "{{ case_id }}"}' 
+                    widget-title="BotEplTutor"
+					error-message="'Algo no esta bien'"
+                ></rasa-chatbot-widget>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Scripts de Rasa Chatbot y Socket.IO #}
+<script type="module" src="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.esm.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
+
+<script>
+    // REEMPLAZA ESTE VALOR: El ID real de tu extensión
+    const EXTENSION_ID = "dlfnmjnmhljcjpcfnlobkghefcoojibc";
+
+    // Capa de abstracción genérica para el runtime (Compatibilidad entre navegadores)
+    const browserRuntime = (typeof browser !== 'undefined' && browser.runtime) ? browser.runtime : 
+                           (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime : 
+                           null;
+
+    let errorPollingInterval = null;
+    const POLLING_FREQUENCY = 5000; // 5 segundos
+	let errorEPL = false;
+	let MensajeExt = false;
+	let errorText = "";
+	let textoExt = "";
+	let socket = null; 
+    let sessionId = null;
+	let errorMsgExt = null;
+	let MsgTextoExt = null;
+	const tipo_caso = {{case_id}};
+	const url_rasa = "{{rasa_url}}";
+	
+	// 1. Detectar si el navegador está en localhost
+	const esLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+	console.log("Detectado entorno local:", esLocal);
+	console.log("URL de RASA:", url_rasa);
+	
+    // ------------------------------------------------------------------
+    // Funcion de Guardar Historial
+    // ------------------------------------------------------------------	
+	function guardarHistorial(actividad) {
+    fetch("/api/guardar_historial", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: "{{ current_user.id_usu }}",   // Flask inserta el ID del usuario
+            actividad: actividad
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Historial guardado:", data);
+    })
+    .catch(error => {
+        console.error("Error al guardar historial:", error);
+    });
+}
+
+    // ------------------------------------------------------------------
+    // FUNCIÓN DE CONSULTA: Solicita el mensaje a la extensión
+    // ------------------------------------------------------------------
+    function retrieveExternalError() {
+				
+        if (!browserRuntime || !browserRuntime.sendMessage) {
+            console.warn("API de extensión no disponible. ¿Extensión instalada/activa?");
+            return;
+        }
+      
+        // Mensaje externo a la extensión
+        browserRuntime.sendMessage(EXTENSION_ID, { action: 'requestError' }, function(response) {
+            
+            if (browserRuntime.lastError) {
+                console.error("Error al comunicarse con la extensión:", browserRuntime.lastError.message);
+                return;
+            }
+            
+            if (response && response.error) {
+                const errorMsg = response.error;
+				
+				console.log("MENSAJE RECIBIDO DE LA EXTENSIÓN:", errorMsg);
+				
+				displayErrorOnPage(errorMsg);
+	        }
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // FUNCIÓN DE VISUALIZACIÓN: Muestra el error en el DOM
+    // ------------------------------------------------------------------
+    function displayErrorOnPage(message) {
+        let errorContainer = document.getElementById('error-message-output');
+        
+        if (!errorContainer) {
+            // Crea el contenedor si no existe
+            errorContainer = document.createElement('div');
+            errorContainer.id = 'error-message-output';
+            errorContainer.className = 'alert alert-danger mt-3';
+            errorContainer.style.fontWeight = 'bold';
+            
+            const containerDiv = document.querySelector('.col-md-8'); // Usamos la columna de la herramienta
+            if (containerDiv) {
+                containerDiv.appendChild(errorContainer);
+            }
+		}
+        
+		// Clasificación del mensaje 
+		let tipo = "error"; 
+		let texto = message;
+		let envia = false;
+		
+		textoExt = message;
+		
+		if (message.startsWith("LIST_EMPTY:")) { 
+			tipo = "lista_vacia"; 
+			texto = message.replace("LIST_EMPTY:", "").trim(); 
+			errorContainer.className = "alert alert-warning mt-3"; 
+			errorContainer.textContent = `Lista vacía: ${texto}`; 
+			MensajeExt = false;
+			console.log(`Entro tipo: ${tipo}`);
+		} 
+		else if (message.startsWith("LIST_FILLED:")) { 
+			tipo = "lista_llena"; 
+			textoExt = message;
+			
+			if (MsgTextoExt == textoExt) {
+				console.error("Mensaje de texto lista igual");
+				MsgTextoExt = textoExt; 
+				MensajeExt = false;
+				envia = false;
+			}
+			else {
+				console.error("Mensaje de texto diferente de lista");
+				texto = message.replace("LIST_FILLED:", "").trim(); 
+				errorContainer.className = "alert alert-info mt-3"; 
+				errorContainer.textContent = `Lista con elementos: ${texto}`; 
+				MsgTextoExt = textoExt;
+				MensajeExt = true;
+				envia = true;
+				console.log(`Entro tipo: ${tipo}`);
+			}
+		} 
+		else { 
+			tipo = "error"; 
+			errorContainer.className = "alert alert-danger mt-3"; 
+			errorContainer.textContent = `Error EPL detectado: ${texto}`; 
+			console.log(`Entro tipo: ${tipo}`);		
+			// Actualiza el texto con el nuevo error
+			errorText = `${message}`;	
+			
+			if (errorMsgExt == errorText) {
+				console.error("Mensaje de ERROR igual");
+				errorMsgExt = errorText;
+				MensajeExt = false;
+				envia = false;
+			}
+			else {
+				console.error("Mensaje de ERROR diferente");
+				errorMsgExt = errorText;
+				MensajeExt = true;
+				envia = true;
+			}
+		
+			if (errorText !=="" || MensajeExt) {
+				errorContainer.textContent = `Error de EPL detectado: ${message}`;
+				console.log(`Mensaje error EPL: ${errorText}`);
+				console.log("Mensaje Error EPL Detectado para enviar al chatbot");
+			}
+			else {
+				console.log("Mensaje Error EPL Detectado no varia, por lo cual no se va enviar al chatbot");
+			}
+		}	
+		
+		// Enviar al chatbot 
+		if (envia) {
+			enviarMensajeAlChatbot(tipo, texto);
+		}
+    }
+	
+	function enviarMensajeAlChatbot(tipo, texto) {
+		if (!socket || !sessionId) {
+			console.warn("Chatbot no conectado todavía.");
+			return;
+		}
+		else if (socket && sessionId) {
+			let payload = "";
+			
+			console.log("Entro funcion enviarMensajeAlChatbot con tipo y texto :", tipo, texto);
+			
+			if (tipo === "error") {
+				// Saneado básico
+				let sanitized = texto.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '\\"');
+				let v_error_epl = sanitized.replace("Please check the EPL Module Text", "").trim()
+				if (tipo_caso == 3) {
+				    console.log("Entro error para caso 3");
+					payload = `/error_epl_detectado{"error_epl":"${v_error_epl}"}`;
+				}
+				else {
+					console.log("Entro error para caso 1 o 2");
+					payload = v_error_epl;
+				}
+			}
+			//else if (tipo === "lista_vacia") {
+			//	payload = `/lista_vacia_detectada{"detalle":"${sanitized}"}`;
+			//}
+			else if (tipo === "lista_llena") {
+				//payload = `/lista_llena_detectada{"detalle":"${sanitized}"}`;
+				payload = `/lista_llena_detectada`;
+			}		
+			
+			const p_actividad = `Hay resultados para la practica EPL del caso de estudio : ${tipo_caso}`;
+			console.log("Actividad generada:", p_actividad);
+
+			guardarHistorial(p_actividad);
+			console.log("Enviando al chatbot:", payload);
+
+			socket.emit("user_uttered", {
+			message: payload,
+			session_id: sessionId
+			});
+		}
+	}
+
+
+    // ------------------------------------------------------------------
+    // FUNCIONES DE POLLING: Iniciar el sondeo continuo
+    // ------------------------------------------------------------------
+    function startErrorPolling() {
+        if (errorPollingInterval) {
+            clearInterval(errorPollingInterval);
+        }
+
+        console.log(`Iniciando sondeo de errores de la extensión cada ${POLLING_FREQUENCY / 1000} segundos...`);
+        
+        errorPollingInterval = setInterval(retrieveExternalError, POLLING_FREQUENCY);
+    }
+
+    window.onload = () => {
+        //const rasaChatWidget = document.querySelector("rasa-chatbot-widget");
+		
+		const ini_actividad = `Entró en la práctica EPL del caso de estudio : ${tipo_caso}`;
+		console.log("Actividad inicial generada:", ini_actividad);
+
+		guardarHistorial(ini_actividad);
+        
+        // El iframe ya está en el HTML, solo iniciamos el sondeo
+		console.log("INICIA EL SONDEO CONTINUO EJECUCIÓN: Llama a startErrorPolling.");
+        startErrorPolling(); 	
+		
+		const rasaChatWidget = document.querySelector("rasa-chatbot-widget");
+
+        if (rasaChatWidget) {
+            console.log("Widget de Rasa cargado correctamente.");
+
+			console.log("Estado previo: Intentando vincular eventos al widget...");
+
+            // Escuchar el evento de inicialización del chat
+            rasaChatWidget.addEventListener('chatSessionStarted', (event) => {
+                sessionId = event.detail.sessionId;
+                console.log("Sesión de chat iniciada. ID de Sesión:", sessionId);
+
+				// Conexión a Rasa via socket.io
+                // socket = io("http://localhost:5005"); // Cambiar si usas otro host/puerto
+				if (!socket) {
+					console.log("Entro NO socket io levantado.");
+					if (esLocal) {
+						console.log("Entro socket io LOCAL.");
+						socket = io(url_rasa);
+					}
+					else {
+						socket = io(url_rasa, {
+								path: "/socket.io",
+								transports: ["websocket", "polling"],
+								extraHeaders: {
+									"Bypass-Tunnel-Reminder": "true"
+								}
+							});
+					}
+					
+					socket.on("connect", () => {
+						console.log("Conectado al servidor Rasa vía Socket.IO");
+					});
+					
+					socket.on("bot_uttered", (message) => {
+						console.log("Mensaje recibido del bot:", message);
+					});
+
+					socket.on("disconnect", () => {
+						console.warn("Socket desconectado.");
+					});	
+				}				
+            });
+
+            // Escuchar el evento de apertura del chat
+            rasaChatWidget.addEventListener('chatWidgetOpened', () => {
+                console.log("Widget abierto por el usuario.");
+            });
+
+            // Escuchar el evento de cuando el usuario cierra el chat
+            rasaChatWidget.addEventListener('chatWidgetClosed', () => {
+                console.log("Widget cerrado por el usuario.");
+            });
+
+            // Escuchar cuando el usuario envía un mensaje
+            rasaChatWidget.addEventListener('chatWidgetSentMessage', (event) => {
+                console.log("Mensaje enviado por el usuario:", event.detail);
+            });
+
+            // Escuchar cuando el widget recibe un mensaje del bot
+            rasaChatWidget.addEventListener('chatWidgetReceivedMessage', (event) => {
+                const message = event.detail;
+                console.log("Mensaje recibido del bot (detalle completo):", message);
+            });
+
+            // Escuchar cuando se hace clic en un enlace (dentro del chat)
+            rasaChatWidget.addEventListener('chatWidgetHyperlinkClicked', (event) => {
+                console.log("Enlace clickeado dentro del chat:", event);
+            });
+
+            // Escuchar cuando se hace QuickReply
+            rasaChatWidget.addEventListener('chatWidgetQuickReply', (event) => {
+                console.log("QuickReply clickeado:", event);
+            });
+           
+        } else {
+            console.error("No se pudo encontrar el widget de Rasa.");
+        }
+    };
+</script>
+{% endblock %}

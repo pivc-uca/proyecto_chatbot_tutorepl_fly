@@ -1,0 +1,20 @@
+# Entornos virtuales
+venv_flask/
+venv_flask310/
+venv/
+env/
+.env
+__pycache__/
+*.pyc
+
+# Datos locales
+instance/
+*.db
+*.sqlite3
+
+# Archivos de sistema y logs
+.git
+.gitignore
+.vscode/
+.idea/
+*.log

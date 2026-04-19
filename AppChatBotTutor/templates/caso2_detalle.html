@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Caso de Estudio 2: Tráfico de Carreteras{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h1 class="mb-4 text-center">Caso de Estudio 2: Tráfico de Carreteras</h1>
+            <p class="lead text-center">
+                En este escenario, tenemos un monitoreo inteligente del coche, cada sensor emite una señal cada pocos milisegundos.
+            </p>
+
+            <div class="text-center my-4">
+                <img src="{{ url_for('static', filename='imagenes/trafico_carretera_coche.png') }}"
+                     alt="Dibujo coche."
+                     class="img-fluid rounded shadow" style="max-width: 400px; border: 1px solid #ddd;">
+            </div>
+
+            <h2 class="mt-5 mb-3">Descripción Detallada</h2>
+            <p>
+                En este caso, trabajarás con los datos de los sensores de un coche que miden:
+			<ul>
+                <li>Presión de las ruedas.</li>
+				<li>Velocidad del coche.</li>
+                <li>Asiento ocupado o libre.</li>
+			</ul>	
+			
+				El objetivo principal es aprender a construir consultas en el Lenguaje de Procesamiento de Eventos (EPL) que te permitan identificar situaciones en tiempo real. Esto incluye generar notificaciones cuando se detecten los siguientes patrones de eventos:
+            </p>
+            <ul>
+				<li><strong>ExplosionRueda (E):</strong> la presión de la rueda baja a &lt;= 60 % de la presión original en menos de T segundos.</li>
+                <li><strong>Colision (C):</strong> la velocidad del coche superior a 50 km/h pasa a 0 km/h en menos de T segundos.</li>
+				<li><strong>OcupanteAbandonaAsiento (O):</strong> el asiento ocupado pasa a estar libre.</li>
+				<li><strong>AccidenteOcupanteDespedido (A):</strong> se explota una rueda y, en los siguientes T segundos, se produce una colisión provocando que el ocupante abandone el asiento.</li>           
+		   </ul>
+		    <div class="text-center my-4">
+                <img src="{{ url_for('static', filename='imagenes/evento_complejo_caso2.png') }}"
+                     alt="Evento complejo."
+                     class="img-fluid rounded shadow" style="max-width: 400px; border: 1px solid #ddd;">
+            </div>
+            <p>
+                Para el evento complejo AccidenteOcupanteDespedido <strong>A</strong> se requerirá que se cumpla los tres (3) patrones simples de los eventos Explosión de rueda <strong>(E)</strong> → Colisión <strong>(C)</strong> → Ocupante abandono de asiento <strong>(O)</strong>.
+            </p>	
+            <p>
+                Este caso está diseñado para nivel <strong>intermedios</strong>, proporcionando una guía paso a paso para familiarizarte con la sintaxis y la lógica de EPL. Tu misión será buscar patrones simples o anomalías en tiempo real.
+            </p>
+            <script>
+                // Variables para rastrear si los botones de Monitor, Warning y Critical han sido clickeados
+                let ERClicked = false;
+                let CClicked = false;
+				let OAAClicked = false;
+                let AODClicked = false;
+
+                // Función para mostrar un paso específico y ocultar los demás
+                function mostrarPaso(id) {
+                    //document.querySelectorAll('.paso').forEach(p => p.style.display = 'none');
+                    //document.getElementById(id).style.display = 'block';
+					const paso = document.getElementById(id);
+					paso.style.display = 'block';   // Lo muestra
+					paso.classList.add('visible');  // Marca que ya fue mostrado
+                }
+
+                // Función para verificar el estado del botón "Paso 5"
+                function checkPaso5ButtonState() {
+                    const btnShowPaso5Content = document.getElementById('btnPaso5');
+
+                    // Deshabilitar los botones de cada evento una vez clickeados
+                    if (ERClicked) { document.getElementById('btnER').disabled = true; }
+                    if (CClicked) { document.getElementById('btnC').disabled = true; }
+					if (OAAClicked) { document.getElementById('btnOAA').disabled = true; }
+                    if (AODClicked) { document.getElementById('btnAOD').disabled = true; }
+
+                    if (ERClicked && CClicked && OAAClicked && AODClicked) {
+                        btnShowPaso5Content.disabled = false; // Habilitar el botón para mostrar el contenido del Paso 5
+                    } else {
+                        btnShowPaso5Content.disabled = true; // Mantener deshabilitado
+                    }
+                }
+
+                // Función para intentar mostrar el Paso 5
+                function attemptShowPaso5() {
+                    //if (ERClicked && CClicked && OAAClicked && AODClicked) {
+                        mostrarPaso('paso5');
+						
+                        // Habilita y muestra el enlace a practica_epl.html
+                        const practicaLinkContainer = document.getElementById('practica-link-container');
+                        const linkPracticaEPL = document.getElementById('linkPracticaEPL');
+
+                        practicaLinkContainer.style.display = 'block'; // Muestra el contenedor del enlace
+                        linkPracticaEPL.classList.remove('disabled-link'); // Habilita el enlace						
+                    //} else {
+                        // Usar un mensaje personalizado en lugar de alert()
+                        //const messageBox = document.getElementById('messageBox');
+                        //const messageText = document.getElementById('messageText');
+                        //messageText.textContent = 'Debes recorrer todos los eventos antes de avanzar al Paso 5.';
+                        //messageBox.style.display = 'block';
+                    //}
+                }
+				
+                // Función para cerrar el mensaje de error
+                function closeMessageBox() {
+                    document.getElementById('messageBox').style.display = 'none';
+                }
+				
+				function goBackAndClose(url) {
+					window.location.href = url;
+				}				
+           </script>
+            
+            <h2 class="mt-5 mb-3">Pasos a seguir</h2>
+            <div id="paso1" class="paso" style="display:block;">
+                <p>Definir el tipo de evento</p>
+                <ul>
+                    <li>Cada sensor se representara dentro de la definicion del evento: presion de las ruedas (4), velocidad y asientos (4)</li>
+                    <li>Uso del esquema <strong>SCHEMA</strong></li>
+                    <li>Un evento debe definirse con: campos , tipos de datos</li>
+                    <li>Ejemplo: <strong>create schema Evento(objeto String, objeto2 Integer, objeto3 Boolean);</strong></li>
+                </ul>
+                <button onclick="mostrarPaso('paso2')">➡️ Siguiente</button>
+            </div>
+
+            <div id="paso2" class="paso" style="display:none;">
+                <p>Asociar nombres a las consultas</p>
+                <ul>
+                    <li>Identificar los diferentes patrones</li>
+                    <li>Uso de anotaciones <strong>@Name</strong></li>
+                    <li>Ejemplo: <strong>@Name('Patron1')</strong></li>
+                </ul>
+                <button onclick="mostrarPaso('paso3')">➡️ Siguiente</button>                
+            </div>
+            
+            <div id="paso3" class="paso" style="display:none;">
+                <p>Extraer data de los eventos simples que llegan en tiempo real</p>    
+                <ul>
+                    <li>Uso de seleccion o consulta <strong>SELECT</strong></li>
+                    <li>Filtrar eventos según condiciones, Agrupar datos en el tiempo, Detectar patrones, Calcular promedios, conteos, etc</li>
+                    <li>Ejemplo: <strong>select * from Evento;</strong></li>
+                </ul>
+                <button onclick="mostrarPaso('paso4ER')">➡️ Siguiente</button>  
+            </div>
+       
+            <div id="paso4ER" class="paso" style="display:none;">
+                <p>Patron simple <strong>Explosion Rueda</strong></p>
+                <p>Detectar la caida de la presión de una rueda ( 60% ) muy brusca en muy poco tiempo</p>
+                <ul>
+					<li>Usar operador de patron <strong>pattern</strong> con disparador <strong>every</strong> con seguimiento <strong>-></strong> (followed-by) que significa "seguido por".</li>
+					<li>Para filtar usar operadores de comparacion como <strong>=</strong> y/0 <strong>&lt;</strong>.</li>
+					<li>Usar filtro guard <strong>timer:within</strong> como condicionamiento que obliga a que un patrón ocurra dentro de un tiempo específico.</li>
+                </ul>                    
+                <button onclick="mostrarPaso('paso4C')">🔁 Siguiente evento</button>
+            </div>    
+            
+            <div id="paso4C" class="paso" style="display:none;">
+                <p>Patron simple <strong>Colision</strong></p>
+                <p>Detectar que la velocidad del coche pasa de un valor mayor de 50 km/h a 0 km/h en un periodo corto </p>
+                <ul>
+					<li>Usar operador de patron <strong>pattern</strong> con disparador <strong>every</strong> con seguimiento <strong>-></strong> (followed-by) que significa "seguido por".</li>
+					<li>Para filtar usar operadores de comparacion como <strong>=</strong> y/0 <strong>&lt;</strong>.</li>
+					<li>Usar filtro guard <strong>timer:within</strong> como condicionamiento que obliga a que un patrón ocurra dentro de un tiempo específico.</li>
+                </ul>                    
+                <button onclick="mostrarPaso('paso4OAA')">🔁 Siguiente evento</button>
+            </div>    
+
+            <div id="paso4OAA" class="paso" style="display:none;">
+                <p>Patron simple <strong>Ocupante Abandona Asiento</strong></p>
+                <p>Detectar que un asiento que estaba ocupado pasa a estar libre</p>
+                <ul>
+					<li>Usar operador de patron <strong>pattern</strong> con disparador <strong>every</strong> con seguimiento <strong>-></strong> (followed-by) que significa "seguido por".</li>
+					<li>Para filtar usar operadores de comparacion como <strong>=</strong>.</li>
+                </ul>                    
+                <button onclick="mostrarPaso('paso4AOD')">🔁 Siguiente evento</button>
+            </div>    
+            
+            <div id="paso4AOD" class="paso" style="display:none;">
+                <p>Patron complejo <strong>Accidente Ocupante Despedido</strong></p>
+                <p>Este patrón encadena los tres eventos anteriores, Explosión de rueda <strong>(E)</strong> → Colisión <strong>(C)</strong> → Ocupante abandono de asiento <strong>(O)</strong> todo en X segundos, cada uno con una condición distinta </p>
+                <ul>
+					<li>Usar operador de patron <strong>pattern</strong> con disparador <strong>every</strong> con seguimiento <strong>-></strong> (followed-by) que significa "seguido por".</li>
+					<li>Usar filtro guard <strong>timer:within</strong> como condicionamiento que obliga a que un patrón ocurra dentro de un tiempo específico.</li>
+                </ul>                    
+ 				<button onclick="attemptShowPaso5()">➡️ Siguiente</button>
+            </div>   			
+
+            <div id="paso5" class="paso" style="display:none;">
+                <p>Creación de un flujo de eventos</p>
+                <ul>
+                    <li>Enviar los resultados de una consulta o patrón a un nuevo flujo de eventos</li>
+                    <li>Uso de <strong>INSERT INTO</strong></li>
+                    <li>Ejemplo: <strong>insert into NuevoEvento
+                        select * from EventoSimple where valor > 100;</strong></li>
+                </ul>
+	            <p>¡Listo para practicar!  Haz click en el link. En la pagina de practica tendras un <strong>ChatBot Tutor</strong></p>
+				   
+                <div id="practica-link-container" class="text-center mt-5" style="display:none;">
+                         <a href="{{ url_for('practica_epl', case_id=2, student_name=user.nombres) }}"
+					   target="_blank"	 
+                       id="linkPracticaEPL"
+                       class="btn btn-primary btn-lg disabled-link">➡️ Ir a la Práctica</a>
+                </div>				
+            </div>
+
+			<div class="row mt-5 mb-5">
+				<div class="col-md-10 offset-md-1 text-center mt-5">
+					<hr>
+					<button onclick="goBackAndClose('{{ url_for('estudiante_pagina') }}')" 
+							class="btn btn-info btn-lg mt-3">
+						Volver al Panel de Estudiante
+					</button>
+				</div>
+			</div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Message Box for Alerts -->
+<div id="messageBox" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    text-align: center;
+    max-width: 400px;
+">
+    <p id="messageText" style="margin-bottom: 15px; color: #333;"></p>
+    <button onclick="closeMessageBox()" style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    ">Entendido</button>
+</div>
+
+{% endblock %}
